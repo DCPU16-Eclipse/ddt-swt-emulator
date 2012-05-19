@@ -4,17 +4,22 @@ import java.io.PrintStream;
 
 import org.eclipse.swt.widgets.Display;
 
+import com.kokakiwi.dcpu.emulator.swt.core.DefaultSWTKeyboard;
+import com.kokakiwi.dcpu.emulator.swt.listeners.CoreEmulationListener;
 import com.kokakiwi.dcpu.emulator.swt.ui.ScreenWindow;
 
 import de.codesourcery.jasm16.WordAddress;
 import de.codesourcery.jasm16.emulator.Emulator;
+import de.codesourcery.jasm16.emulator.IEmulationListener;
 import de.codesourcery.jasm16.emulator.IEmulator;
 import de.codesourcery.jasm16.emulator.devices.impl.DefaultClock;
 
 public class CoreEmulator
 {
-    private final IEmulator emulator;
-    private PrintStream     out;
+    private final IEmulator          emulator;
+    private PrintStream              out;
+    private final IEmulationListener emulationListener;
+    private final DefaultSWTKeyboard keyboard = new DefaultSWTKeyboard();
     
     public CoreEmulator()
     {
@@ -24,7 +29,11 @@ public class CoreEmulator
     public CoreEmulator(PrintStream out)
     {
         emulator = new Emulator();
-        // emulator.setOutput(out);
+        
+        emulationListener = new CoreEmulationListener(out);
+        emulator.addEmulationListener(emulationListener);
+        
+        emulator.setOutput(out);
         emulator.setEmulationSpeed(IEmulator.EmulationSpeed.REAL_SPEED);
         
         this.out = out;
@@ -44,6 +53,8 @@ public class CoreEmulator
     public void run(byte[] program)
     {
         emulator.reset(true);
+        
+        // emulator.addBreakpoint(new Breakpoint(Address.wordAddress(0x002b)));
         
         emulator.loadMemory(WordAddress.ZERO, program);
         
@@ -68,5 +79,10 @@ public class CoreEmulator
     public void setOutput(PrintStream out)
     {
         this.out = out;
+    }
+    
+    public DefaultSWTKeyboard getKeyboard()
+    {
+        return keyboard;
     }
 }

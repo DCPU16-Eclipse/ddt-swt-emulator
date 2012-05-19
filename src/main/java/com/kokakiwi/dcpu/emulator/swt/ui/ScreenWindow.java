@@ -19,7 +19,7 @@ import org.eclipse.swt.layout.FillLayout;
 public class ScreenWindow extends Shell
 {
     private final CoreEmulator emulator;
-    private final ScreenPanel screen;
+    private final ScreenPanel  screen;
     
     public ScreenWindow(Display display, final CoreEmulator emulator)
     {
@@ -33,6 +33,8 @@ public class ScreenWindow extends Shell
         Frame frame = SWT_AWT.new_Frame(composite);
         
         screen = new ScreenPanel(emulator);
+        
+        emulator.getKeyboard().bind(this);
         
         frame.add(screen);
         
@@ -48,7 +50,10 @@ public class ScreenWindow extends Shell
     protected void createContents()
     {
         setText("Screen");
-        setSize(DefaultScreen.SCREEN_WIDTH * 4, DefaultScreen.SCREEN_HEIGHT * 4);
+        setSize(DefaultScreen.STANDARD_SCREEN_COLUMNS
+                * DefaultScreen.GLYPH_WIDTH * 4,
+                DefaultScreen.STANDARD_SCREEN_ROWS * DefaultScreen.GLYPH_HEIGHT
+                        * 4);
     }
     
     @Override
